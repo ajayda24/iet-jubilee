@@ -1,12 +1,7 @@
 "use client";
 
-import React from "react"
-
-import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -14,35 +9,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Sparkles, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Sparkles, Chrome, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo:
-          process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          `${window.location.origin}/`,
-      },
-    });
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo:
+            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
+            `${window.location.origin}/auth/callback`,
+        },
+      });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setSent(true);
+      if (error) {
+        setError(error.message);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -57,65 +53,27 @@ export default function LoginPage() {
             Sign in to submit and vote on caption ideas
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          {sent ? (
-            <div className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle2 className="w-8 h-8 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Check your email</h3>
-                <p className="text-muted-foreground text-sm mt-1">
-                  We sent a magic link to <strong>{email}</strong>
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSent(false);
-                  setEmail("");
-                }}
-                className="w-full"
-              >
-                Use a different email
-              </Button>
+        <CardContent className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-md p-3">
+              <p className="text-sm text-destructive">{error}</p>
             </div>
-          ) : (
-            <form onSubmit={handleMagicLink} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-                  {error}
-                </p>
-              )}
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  "Sending..."
-                ) : (
-                  <>
-                    Continue with Magic Link
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </form>
           )}
+
+          <Button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            size="lg"
+            className="w-full"
+          >
+            <Chrome className="w-5 h-5 mr-2" />
+            {loading ? "Signing in..." : "Continue with Google"}
+            <ArrowRight className="w-4 h-4 ml-auto" />
+          </Button>
+
+          <p className="text-xs text-muted-foreground text-center">
+            We'll use your Google account to create your profile
+          </p>
         </CardContent>
       </Card>
     </div>

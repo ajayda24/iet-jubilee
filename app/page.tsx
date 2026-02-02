@@ -17,6 +17,9 @@ export default async function HomePage() {
   let dbError: string | null = null;
   let userLikedCaptions = new Set<string>();
 
+  console.log(user, "current user");
+  
+
   try {
     const { data, error } = await supabase
       .from("captions")
