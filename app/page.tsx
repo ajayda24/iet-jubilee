@@ -18,7 +18,6 @@ export default async function HomePage() {
   let userLikedCaptions = new Set<string>();
 
   console.log(user, "current user");
-  
 
   try {
     const { data, error } = await supabase
@@ -88,42 +87,12 @@ export default async function HomePage() {
 
         {dbError ? (
           <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 mb-8">
-            <div className="text-center mb-6">
-              <h2 className="font-semibold text-destructive mb-2">
-                Database Setup Required
-              </h2>
-              <p className="text-sm text-foreground">{dbError}</p>
-            </div>
-            <div className="bg-background rounded p-4 mb-6 border border-border/50">
-              <p className="text-xs text-muted-foreground font-mono mb-2">
-                Step 1: Copy SQL script
-              </p>
-              <p className="text-sm text-foreground font-mono">
-                File:{" "}
-                <span className="text-primary font-bold">
-                  /scripts/001_create_tables.sql
-                </span>
-              </p>
-              <p className="text-xs text-muted-foreground mt-3 mb-3">
-                Step 2: Paste in Supabase SQL Editor
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Step 3: Click "Run" and wait for success
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Link href="/setup" className="flex-1">
-                <button className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium transition-colors">
-                  Setup Guide →
-                </button>
-              </Link>
-              <button
-                onClick={() => window.location.reload()}
-                className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 text-sm font-medium transition-colors"
-              >
-                Refresh Page
-              </button>
-            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 text-sm font-medium transition-colors"
+            >
+              Refresh Page
+            </button>
           </div>
         ) : null}
 
